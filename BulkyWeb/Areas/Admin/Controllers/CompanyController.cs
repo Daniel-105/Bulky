@@ -63,45 +63,18 @@ namespace BulkyWeb.Areas.Admin.Controllers
         }
 
         [HttpPost] // Defining that this action is of the type POST
-        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
+        public IActionResult Upsert(CompanyVM companyVM)
         {
             if (ModelState.IsValid)
             {
-                // associating the path for the wwwroot (/) with the variable wwwRootPath
-                string wwwRootPath = _webHostEnviroment.WebRootPath;
-                if (file != null)
-                {
-                    //Creating a new Guid and conserting it to a string 
-                    // Then concatnate that with the extention of the file (.jpeg, .pdf, etc...)
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\product");
-
-                    // Check if there is an image loaded
-                    if (!string.IsNullOrEmpty(productVM.Product.ImageURL))
-                    {
-                        //Delete the old image
-                        var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageURL.TrimStart('\\'));
-                        if (System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
-
-                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
-                    productVM.Product.ImageURL = @"\images\product\" + fileName;
-                }
-
-                if (productVM.Product.Id == 0)
+                if (companyVM.Company.Id == 0)
                 {
                     // Stages the post
-                    _unitOfWork.Product.Add(productVM.Product);
+                    _unitOfWork.Company.Add(companyVM.Company);
                 }
                 else
                 {
-                    _unitOfWork.Product.Update(productVM.Product);
+                    _unitOfWork.Company.Update(companyVM.Company);
                 }
 
                 // Push the post to the database
@@ -111,12 +84,12 @@ namespace BulkyWeb.Areas.Admin.Controllers
             }
             else
             {
-                productVM.CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+                companyVM.CompanyList = _unitOfWork.Company.GetAll().Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 });
-                return View(productVM);
+                return View(companyVM);
             }
         }
 
