@@ -21,13 +21,10 @@ namespace BulkyWeb.Areas.Admin.Controllers
         // declaring the variable that holds the connection to the database
         // allowing me to later use this variable intead of applying method on the class AplicationDbContext
         private readonly IUnitOfWork _unitOfWork;
-        // injecting this built in function of .net core.
-        private readonly IWebHostEnvironment _webHostEnviroment;
         // Constructor (it has the same name as the controller class)
-        public CompanyController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnviroment)
+        public CompanyController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _webHostEnviroment = webHostEnviroment;
         }
         public IActionResult Index()
         {
@@ -38,43 +35,35 @@ namespace BulkyWeb.Areas.Admin.Controllers
         public IActionResult Upsert(int? id)
         {
 
-            CompanyVM companyVM = new()
-            {
-                CompanyList = _unitOfWork.Company.GetAll().Select(u => new SelectListItem
-                {
-                    Text = u.Name,
-                    Value = u.Id.ToString()
-                }),
-                Company = new Company()
-            };
+           
             // When there is no id in the URL
             if (id == null || id == 0)
             {
                 // for Create
-                return View(companyVM);
+                return View(new Company());
             }
             //When there is an Id in the URL
             else
             {
                 // for update
-                companyVM.Company = _unitOfWork.Company.Get(x => x.Id == id);
-                return View(companyVM);
+                Company companyObj = _unitOfWork.Company.Get(x => x.Id == id);
+                return View(companyObj);
             }
         }
 
         [HttpPost] // Defining that this action is of the type POST
-        public IActionResult Upsert(CompanyVM companyVM)
+        public IActionResult Upsert(Company CompanyObj)
         {
             if (ModelState.IsValid)
             {
-                if (companyVM.Company.Id == 0)
+                if (CompanyObj.Id == 0)
                 {
                     // Stages the post
-                    _unitOfWork.Company.Add(companyVM.Company);
+                    _unitOfWork.Company.Add(CompanyObj);
                 }
                 else
                 {
-                    _unitOfWork.Company.Update(companyVM.Company);
+                    _unitOfWork.Company.Update(CompanyObj);
                 }
 
                 // Push the post to the database
@@ -84,12 +73,7 @@ namespace BulkyWeb.Areas.Admin.Controllers
             }
             else
             {
-                companyVM.CompanyList = _unitOfWork.Company.GetAll().Select(u => new SelectListItem
-                {
-                    Text = u.Name,
-                    Value = u.Id.ToString()
-                });
-                return View(companyVM);
+                return View(CompanyObj);
             }
         }
 
