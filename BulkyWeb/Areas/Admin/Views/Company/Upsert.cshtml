@@ -1,101 +1,68 @@
 ﻿@using Bulky;
 @using Bulky.Models;
-@model ProductVM
+@model CompanyVM 
 
 
 <div class="card shadow border-0 mt-4">
     <div class="card-header bg-secondary bg-gradient m-lg-0 py-3">
         <div class="row">
             <div class="col-12 text-center">
-                <h2 class="text-white py-2"> @(Model.Product.Id != 0 ? "Update" : "Create")  Product</h2>
+                <h2 class="text-white py-2"> @(Model.Company.Id != 0 ? "Update" : "Create")  Company</h2>
             </div>
         </div>
     </div>
     <div class="card-body p-4">
 
         <form method="post" enctype="multipart/form-data">
-            <input asp-for="Product.Id" hidden />
-            <input asp-for="Product.ImageURL" hidden />
+            <input asp-for="Company.Id" hidden />
 
             <div class="row">
                 <div class="col-10">
                     <div class="border p-3 mt-4">
                         <div asp-validation-summary="All"></div>
                         <div class="form-floating py-2 col-12">
-                            <input asp-for="Product.Title" type="text" class="form-control border-0 shadow" />
-                            <label asp-for="Product.Title" class="ms-2"></label>
-                            <span asp-validation-for="Product.Title" class="text-danger"></span>
+                            <input asp-for="Company.Name" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="Company.Name" class="ms-2"></label>
+                            <span asp-validation-for="Company.Name" class="text-danger"></span>
                         </div>
                         <div class="form-floating py-2 col-12">
-                            <textarea asp-for="Product.Description" type="text" class="form-control border-0 shadow"> </textarea>
-                            <label asp-for="Product.Description" class="ms-2"></label>
+                            <textarea asp-for="Company.StreetAddress" type="text" class="form-control border-0 shadow"> </textarea>
+                            <label asp-for="Company.StreetAddress" class="ms-2"></label>
                         </div>
                         <div class="form-floating py-2 col-12">
-                            <input asp-for="Product.ISBN" type="text" class="form-control border-0 shadow" />
-                            <label asp-for="Product.ISBN" class="ms-2"></label>
-                            <span asp-validation-for="Product.ISBN" class="text-danger"></span>
+                            <input asp-for="Company.City" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="Company.City" class="ms-2"></label>
+                            <span asp-validation-for="Company.City" class="text-danger"></span>
                         </div>
                         <div class="form-floating py-2 col-12">
-                            <input asp-for="Product.Author" type="text" class="form-control border-0 shadow" />
-                            <label asp-for="Product.Author" class="ms-2"></label>
-                            <span asp-validation-for="Product.Author" class="text-danger"></span>
+                            <input asp-for="Company.State" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="Company.State" class="ms-2"></label>
+                            <span asp-validation-for="Company.State" class="text-danger"></span>
                         </div>
                         <div class="form-floating py-2 col-12">
-                            <input asp-for="Product.ListPrice" type="text" class="form-control border-0 shadow" />
-                            <label asp-for="Product.ListPrice" class="ms-2"></label>
-                            <span asp-validation-for="Product.ListPrice" class="text-danger"></span>
+                            <input asp-for="Company.PostalCode" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="Company.PostalCode" class="ms-2"></label>
+                            <span asp-validation-for="Company.PostalCode" class="text-danger"></span>
                         </div>
                         <div class="form-floating py-2 col-12">
-                            <input asp-for="Product.Price" type="text" class="form-control border-0 shadow" />
-                            <label asp-for="Product.Price" class="ms-2"></label>
-                            <span asp-validation-for="Product.Price" class="text-danger"></span>
-                        </div>
-                        <div class="form-floating py-2 col-12">
-                            <input asp-for="Product.Price50" type="text" class="form-control border-0 shadow" />
-                            <label asp-for="Product.Price50" class="ms-2"></label>
-                            <span asp-validation-for="Product.Price50" class="text-danger"></span>
-                        </div>
-                        <div class="form-floating py-2 col-12">
-                            <input asp-for="Product.Price100" type="text" class="form-control border-0 shadow" />
-                            <label asp-for="Product.Price100" class="ms-2"></label>
-                            <span asp-validation-for="Product.Price100" class="text-danger"></span>
-                        </div>
-                        <div class="form-floating py-2 col-12">
-                            <select asp-for="Product.CategoryId" asp-items="@Model.CategoryList" class="form-select border-0 shadow">
-                                <option>--Select Category--</option>
-                            </select>
-                            <label asp-for="Product.CategoryId" class="ms-2"></label>
-                            <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
-                        </div>
-
-                        <div class="form-floating py-2 col-12">
-                            <input type="file" name="file" class="form-control border-0 shadow" asp-for="Product.ImageURL" />
-                            <label asp-for="Product.ImageURL" class="ms-2"></label>
+                            <input asp-for="Company.PhoneNumber" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="Company.PhoneNumber" class="ms-2"></label>
+                            <span asp-validation-for="Company.PhoneNumber" class="text-danger"></span>
                         </div>
 
                         <div class="row mt-3">
                             <div class="col-6 col-md-3">
-                                <button type="submit" class="btn btn-primary form-control">@(Model.Product.Id != 0 ? "Update" : "Create") Product </button>
+                                <button type="submit" class="btn btn-primary form-control">@(Model.Company.Id != 0 ? "Update" : "Create") Company</button>
                             </div>
                             <div class="col-6 col-md-3">
-                                <a asp-controller="Product" asp-action="Index" class="btn btn-secondary border form-control  ">
+                                <a asp-controller="Company" asp-action="Index" class="btn btn-secondary border form-control  ">
                                     Back to Book List
                                 </a>
                             </div>
                         </div>
                     </div>
-
-
                 </div>
-
-                <div class="col-2">
-                    <img src="@Model.Product.ImageURL" width="100%" />
-                </div>
-
             </div>
-
-
-
         </form>
     </div>
 </div>

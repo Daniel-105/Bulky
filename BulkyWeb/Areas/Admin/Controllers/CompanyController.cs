@@ -38,139 +38,139 @@ namespace BulkyWeb.Areas.Admin.Controllers
         public IActionResult Upsert(int? id)
         {
 
-            //ProductVM productVM = new()
-            //{
-                Company company = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+            CompanyVM companyVM = new()
+            {
+                CompanyList = _unitOfWork.Company.GetAll().Select(u => new SelectListItem
                 {
                     Text = u.Name,
                     Value = u.Id.ToString()
                 }),
-                Product = new Product()
-            //};
+                Company = new Company()
+            };
             // When there is no id in the URL
             if (id == null || id == 0)
             {
                 // for Create
-                return View(productVM);
+                return View(companyVM);
             }
             //When there is an Id in the URL
             else
             {
                 // for update
-                productVM.Product = _unitOfWork.Product.Get(x => x.Id == id);
+                companyVM.Company = _unitOfWork.Company.Get(x => x.Id == id);
+                return View(companyVM);
+            }
+        }
+
+        [HttpPost] // Defining that this action is of the type POST
+        public IActionResult Upsert(ProductVM productVM, IFormFile? file)
+        {
+            if (ModelState.IsValid)
+            {
+                // associating the path for the wwwroot (/) with the variable wwwRootPath
+                string wwwRootPath = _webHostEnviroment.WebRootPath;
+                if (file != null)
+                {
+                    //Creating a new Guid and conserting it to a string 
+                    // Then concatnate that with the extention of the file (.jpeg, .pdf, etc...)
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    // Check if there is an image loaded
+                    if (!string.IsNullOrEmpty(productVM.Product.ImageURL))
+                    {
+                        //Delete the old image
+                        var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageURL.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                    productVM.Product.ImageURL = @"\images\product\" + fileName;
+                }
+
+                if (productVM.Product.Id == 0)
+                {
+                    // Stages the post
+                    _unitOfWork.Product.Add(productVM.Product);
+                }
+                else
+                {
+                    _unitOfWork.Product.Update(productVM.Product);
+                }
+
+                // Push the post to the database
+                _unitOfWork.Save();
+                TempData["success"] = "Category Updated Successfully";
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                productVM.CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
+                {
+                    Text = u.Name,
+                    Value = u.Id.ToString()
+                });
                 return View(productVM);
             }
         }
-    }
 
-    //[HttpPost] // Defining that this action is of the type POST
-    //public IActionResult Upsert(ProductVM productVM, IFormFile? file)
-    //{
-    //    if (ModelState.IsValid)
-    //    {
-    //        // associating the path for the wwwroot (/) with the variable wwwRootPath
-    //        string wwwRootPath = _webHostEnviroment.WebRootPath;
-    //        if (file != null)
-    //        {
-    //            //Creating a new Guid and conserting it to a string 
-    //            // Then concatnate that with the extention of the file (.jpeg, .pdf, etc...)
-    //            string fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
-    //            string productPath = Path.Combine(wwwRootPath, @"images\product");
+        //------------------------
 
-    //            // Check if there is an image loaded
-    //            if (!string.IsNullOrEmpty(productVM.Product.ImageURL))
-    //            {
-    //                //Delete the old image
-    //                var oldImagePath = Path.Combine(wwwRootPath, productVM.Product.ImageURL.TrimStart('\\'));
-    //                if (System.IO.File.Exists(oldImagePath))
-    //                {
-    //                    System.IO.File.Delete(oldImagePath);
-    //                }
-    //            }
+        //public IActionResult Delete(int? id)
+        //{
+        //    if (id == 0 || id == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    Product productFromDb = _unitOfWork.Product.Get(x => x.Id == id);
+        //    if (productFromDb == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    // Returns the file with the name Create.cshtml in the Views_Category folder
+        //    return View(productFromDb);
+        //}
+        //[HttpPost] // Defining that this action is of the type POST
+        //public IActionResult Delete(Product? obj)
+        //{
+        //    if (obj.Id == 0 || obj.Id == null)
+        //    {
+        //        NotFound();
+        //    }
+        //        _unitOfWork.Product.Remove(obj);
+        //        _unitOfWork.Save();
+        //        TempData["success"] = "Category Updated Successfully";
+        //        return RedirectToAction("Index");
+        //    return View();
+        //}
 
-    //            using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-    //            {
-    //                file.CopyTo(fileStream);
-    //            }
-    //            productVM.Product.ImageURL = @"\images\product\" + fileName;
-    //        }
-
-    //        if (productVM.Product.Id == 0)
-    //        {
-    //            // Stages the post
-    //            _unitOfWork.Product.Add(productVM.Product);
-    //        }
-    //        else
-    //        {
-    //            _unitOfWork.Product.Update(productVM.Product);
-    //        }
-
-    //        // Push the post to the database
-    //        _unitOfWork.Save();
-    //        TempData["success"] = "Category Updated Successfully";
-    //        return RedirectToAction("Index");
-    //    }
-    //    else
-    //    {
-    //        productVM.CategoryList = _unitOfWork.Category.GetAll().Select(u => new SelectListItem
-    //        {
-    //            Text = u.Name,
-    //            Value = u.Id.ToString()
-    //        });
-    //        return View(productVM);
-    //    }
-    //}
-
-    //------------------------
-
-    //public IActionResult Delete(int? id)
-    //{
-    //    if (id == 0 || id == null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    Product productFromDb = _unitOfWork.Product.Get(x => x.Id == id);
-    //    if (productFromDb == null)
-    //    {
-    //        return NotFound();
-    //    }
-    //    // Returns the file with the name Create.cshtml in the Views_Category folder
-    //    return View(productFromDb);
-    //}
-    //[HttpPost] // Defining that this action is of the type POST
-    //public IActionResult Delete(Product? obj)
-    //{
-    //    if (obj.Id == 0 || obj.Id == null)
-    //    {
-    //        NotFound();
-    //    }
-    //        _unitOfWork.Product.Remove(obj);
-    //        _unitOfWork.Save();
-    //        TempData["success"] = "Category Updated Successfully";
-    //        return RedirectToAction("Index");
-    //    return View();
-    //}
-
-    #region API CALLs
-    [HttpGet]
-    public IActionResult GetAll()
-    {
-        List<Company> objCompanyList = _unitOfWork.Company.GetAll().ToList();
-        return Json(new { data = objCompanyList });
-    }
-
-    [HttpDelete]
-    public IActionResult Delete(int? id)
-    {
-        var companyToBeDeleted = _unitOfWork.Company.Get(u => u.Id == id);
-        if (companyToBeDeleted == null)
+        #region API CALLs
+        [HttpGet]
+        public IActionResult GetAll()
         {
-            return Json(new { success = false, message = "Error while deleting" });
+            List<Company> objCompanyList = _unitOfWork.Company.GetAll().ToList();
+            return Json(new { data = objCompanyList });
         }
-        _unitOfWork.Company.Remove(companyToBeDeleted);
-        _unitOfWork.Save();
-        return Json(new { success = true, message = "Delete Successfull" });
+
+        [HttpDelete]
+        public IActionResult Delete(int? id)
+        {
+            var companyToBeDeleted = _unitOfWork.Company.Get(u => u.Id == id);
+            if (companyToBeDeleted == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+            _unitOfWork.Company.Remove(companyToBeDeleted);
+            _unitOfWork.Save();
+            return Json(new { success = true, message = "Delete Successfull" });
+        }
+        #endregion
     }
-    #endregion
 }
 //}
